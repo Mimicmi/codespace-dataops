@@ -53,7 +53,7 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
-      - AIRFLOW__WEBSERVER__SECRET_KEY=ao/9Q9XwDe44GaDlzAcCchBwFEIMkHwLbkEm32cvqZw=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=qJEkNVahxnFxI/oEQo0dScAgowSDG+R7LZlL3No/KL8=
       - AIRFLOW__WEBSERVER__RBAC=True
     ports:
       - "8082:8080"
