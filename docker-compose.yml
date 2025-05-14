@@ -30,7 +30,7 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__WEBSERVER__RBAC=True
-      - AIRFLOW__CORE__FERNET_KEY=n7YM4+01XUsIu7zxL8Dawiff7KDjeAloypPje9d7xTg=
+      - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
       - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
       - AIRFLOW__CORE__LOGGING_LEVEL=INFO
     volumes:
@@ -52,7 +52,7 @@ services:
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__FERNET_KEY=n7YM4+01XUsIu7zxL8Dawiff7KDjeAloypPje9d7xTg=
+      - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
       - AIRFLOW__WEBSERVER__SECRET_KEY=ao/9Q9XwDe44GaDlzAcCchBwFEIMkHwLbkEm32cvqZw=
       - AIRFLOW__WEBSERVER__RBAC=True
     ports:
@@ -80,7 +80,7 @@ services:
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__FERNET_KEY=n7YM4+01XUsIu7zxL8Dawiff7KDjeAloypPje9d7xTg=
+      - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
