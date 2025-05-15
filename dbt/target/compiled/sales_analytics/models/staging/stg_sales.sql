@@ -1,12 +1,7 @@
-{{
-  config(
-    materialized='view',
-    schema='staging'
-  )
-}}
+
 
 WITH source AS (
-    SELECT * FROM {{ source('raw', 'raw_sales') }}
+    SELECT * FROM "airflow_db"."public"."raw_sales"
 ),
 
 cleaned AS (

@@ -9,7 +9,6 @@ services:
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
       - ./data:/tmp
-
     networks:
       - epsi_dataops_network
     healthcheck:
@@ -18,9 +17,11 @@ services:
       retries: 5
 
   airflow-init:
-    image: apache/airflow:2.5.0
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    image: custom-airflow:2.5.0
     container_name: epsi_dataops-airflow-init-1
-    # Add proper command to wait for postgres and initialize the database
     command: >
       bash -c "
         airflow db init &&
@@ -39,7 +40,9 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql 
+      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
+      - ./dbt:/usr/app/dbt
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - epsi_dataops_network
     depends_on:
@@ -48,9 +51,11 @@ services:
     restart: on-failure
 
   airflow-webserver:
-    image: apache/airflow:2.5.0
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    image: custom-airflow:2.5.0
     container_name: epsi_dataops-airflow-webserver-1
-    # Add command to start the webserver
     command: webserver
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres/airflow_db
@@ -65,6 +70,8 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
+      - ./dbt:/usr/app/dbt 
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - epsi_dataops_network
     depends_on:
@@ -77,9 +84,11 @@ services:
       retries: 5
 
   airflow-scheduler:
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
     image: apache/airflow:2.5.0
     container_name: epsi_dataops-airflow-scheduler-1
-    # Add command to start the scheduler
     command: scheduler
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres/airflow_db
@@ -90,6 +99,8 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
+      - ./dbt:/usr/app/dbt
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - epsi_dataops_network
     depends_on:
@@ -102,9 +113,11 @@ services:
       context: .
       dockerfile: docker/dbt/Dockerfile
     container_name: epsi_dataops-dbt-1
+    command: ["tail", "-f", "/dev/null"]
     volumes:
       - ./dbt:/usr/app/dbt
       - ./data:/usr/app/data
+      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
     environment:
       - DBT_PROFILES_DIR=/usr/app/dbt
     networks:
@@ -120,6 +133,7 @@ services:
     volumes:
       - ./great_expectations:/usr/app/great_expectations
       - ./data:/usr/app/data
+      - ./dbt:/usr/app/dbt  # Accès aux modèles dbt
     working_dir: /usr/app
     command: ["tail", "-f", "/dev/null"]
     networks:

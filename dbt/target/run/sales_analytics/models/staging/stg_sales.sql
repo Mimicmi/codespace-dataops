@@ -1,12 +1,9 @@
-{{
-  config(
-    materialized='view',
-    schema='staging'
-  )
-}}
+
+  create view "airflow_db"."public_staging"."stg_sales__dbt_tmp" as (
+    
 
 WITH source AS (
-    SELECT * FROM {{ source('raw', 'raw_sales') }}
+    SELECT * FROM "airflow_db"."public"."raw_sales"
 ),
 
 cleaned AS (
@@ -25,3 +22,4 @@ cleaned AS (
 )
 
 SELECT * FROM cleaned
+  );

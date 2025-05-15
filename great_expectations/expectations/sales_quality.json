@@ -1,0 +1,21 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "sales_quality",
+  "expectations": [],
+  "ge_cloud_id": null,
+  "meta": {
+    "citations": [
+      {
+        "batch_request": {
+          "data_asset_name": "default_data_asset_name",
+          "data_connector_name": "default_runtime_data_connector_name",
+          "datasource_name": "my_database",
+          "limit": 1000
+        },
+        "citation_date": "2025-05-15T11:51:53.892013Z",
+        "comment": "Created suite added via CLI"
+      }
+    ],
+    "great_expectations_version": "0.17.7"
+  }
+}

@@ -4,7 +4,7 @@ sources:
     - name: raw
       schema: public
       tables:
-          - name: sales
+          - name: raw_sales
             description: "Table raw des ventes importée depuis le CSV"
 
 models:

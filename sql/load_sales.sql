@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS raw_sales;
+DROP TABLE IF EXISTS raw_sales CASCADE;
 
 CREATE TABLE raw_sales (
     InvoiceNo TEXT,

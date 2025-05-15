@@ -2,7 +2,7 @@ sales_analytics:
     outputs:
         dev:
             type: postgres
-            host: postgres
+            host: epsi_dataops-postgres-1
             port: 5432
             user: airflow
             password: airflow
