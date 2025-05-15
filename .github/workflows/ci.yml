@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches:
+            - dev
+    pull_request:
+        branches:
+            - dev
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:14
+                env:
+                    POSTGRES_USER: airflow
+                    POSTGRES_PASSWORD: airflow
+                    POSTGRES_DB: airflow
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.9"
+
+            - name: Install dependencies
+              run: |
+                  pip install dbt-core dbt-postgres pytest psycopg2-binary
+
+            - name: Run dbt models
+              run: |
+                  dbt deps
+                  dbt run
+                  dbt test
+
+            - name: Run Airflow DAG tests (optional)
+              run: |
+                  pip install apache-airflow
+                  airflow dags list
+                  # ou lancer tes tests unitaires spécifiques
