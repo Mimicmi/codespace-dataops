@@ -5,6 +5,7 @@ from airflow.operators.bash import BashOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from docker.types import Mount
 from airflow.providers.docker.operators.docker import DockerOperator
+import psycopg2
 
 default_args = {
     'owner': 'airflow',
@@ -16,36 +17,33 @@ default_args = {
 
 
 def _validate_data():
-    # context = DataContext(
-    #     "/Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/great_expectations")
-    # checkpoint = LegacyCheckpoint(
-    #     name="my_checkpoint",
-    #     data_context=context,
-    #     config_version=1.0,
-    #     class_name="LegacyCheckpoint",
-    #     run_name_template="%Y%m%d-%H%M%S",
-    #     validations=[
-    #         {
-    #             "batch_request": {
-    #                 "datasource_name": "my_datasource",
-    #                 "data_connector_name": "default_runtime_data_connector_name",
-    #                 "data_asset_name": "sales_data",
-    #                 "runtime_parameters": {
-    #                     "path": "/usr/local/airflow/data/sales.csv"
-    #                 },
-    #                 "batch_identifiers": {"default_identifier_name": "default_id"}
-    #             },
-    #             "expectation_suite_name": "sales.expectations"
-    #         }
-    #     ]
-    # )
-    # results = checkpoint.run()
-    # if not results["success"]:
-    #     raise ValueError("Data validation failed")
+    conn = psycopg2.connect(
+        "dbname=ta_base user=ton_user password=ton_mdp host=ton_hote")
+    cursor = conn.cursor()
 
-    # A 14h30 rien ne fonctionne, code supprimé
+    # 1) Check nulls on CustomerID and UnitPrice
+    cursor.execute("""
+        SELECT COUNT(*) FROM row_sales
+        WHERE CustomerID IS NULL OR UnitPrice IS NULL;
+    """)
+    null_count = cursor.fetchone()[0]
+    if null_count > 0:
+        raise ValueError(
+            f"Data validation failed: {null_count} rows have NULL CustomerID or UnitPrice")
 
-    return
+    # 2) Check duplicates on InvoiceNo + StockCode
+    cursor.execute("""
+        SELECT InvoiceNo, StockCode, COUNT(*) FROM row_sales
+        GROUP BY InvoiceNo, StockCode
+        HAVING COUNT(*) > 1;
+    """)
+    duplicates = cursor.fetchall()
+    if duplicates:
+        raise ValueError(
+            f"Data validation failed: Found duplicates on InvoiceNo + StockCode: {duplicates}")
+
+    cursor.close()
+    conn.close()
 
 
 with DAG(

@@ -1,7 +1,17 @@
-FROM python:3.7-slim
+FROM apache/airflow:2.5.0
 
-RUN apt-get update && apt-get install -y build-essential libffi-dev libssl-dev python3-dev
+USER root
 
-RUN pip install pip --upgrade
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install great_expectations==0.15.9
+RUN pip install --upgrade pip
+
+RUN pip install great_expectations==0.15.46
+
+USER airflow
