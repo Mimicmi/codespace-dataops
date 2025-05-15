@@ -1,0 +1,16 @@
+version: 2
+
+models:
+    - name: fct_daily_revenue
+      description: "Table de fait du revenue quotidien par pays et client"
+      tests:
+          - dbt_expectations.expect_table_row_count_to_be_between:
+                min_value: 1
+                max_value: 100000
+      columns:
+          - name: daily_revenue
+            tests:
+                - not_null
+                - relationships:
+                      to: ref('stg_sales')
+                      field: TotalAmount

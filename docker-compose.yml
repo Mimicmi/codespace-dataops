@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: airflow_db
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+      - ./data:/tmp
+
     networks:
       - epsi_dataops_network
     healthcheck:
@@ -26,7 +28,7 @@ services:
         airflow db upgrade
       "
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__WEBSERVER__RBAC=True
@@ -37,6 +39,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql 
     networks:
       - epsi_dataops_network
     depends_on:
@@ -50,7 +53,7 @@ services:
     # Add command to start the webserver
     command: webserver
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
       - AIRFLOW__WEBSERVER__SECRET_KEY=qJEkNVahxnFxI/oEQo0dScAgowSDG+R7LZlL3No/KL8=
@@ -61,6 +64,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
     networks:
       - epsi_dataops_network
     depends_on:
@@ -78,19 +82,50 @@ services:
     # Add command to start the scheduler
     command: scheduler
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow_db
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres/airflow_db
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__FERNET_KEY=3duZljO7sN2hJ8J2Yz4XJ0cd+S1GOdT/Eptcdnz3eOo=
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - /Users/simon/Documents/Epsi/i2/DataOps/codespace-dataops/sql:/opt/airflow/sql
     networks:
       - epsi_dataops_network
     depends_on:
       - airflow-init
       - airflow-webserver
     restart: always
+
+  dbt:
+    build:
+      context: .
+      dockerfile: docker/dbt/Dockerfile
+    container_name: epsi_dataops-dbt-1
+    volumes:
+      - ./dbt:/usr/app/dbt
+      - ./data:/usr/app/data
+    environment:
+      - DBT_PROFILES_DIR=/usr/app/dbt
+    networks:
+      - epsi_dataops_network
+    depends_on:
+      - postgres
+
+  great_expectations:
+    build:
+      context: .
+      dockerfile: docker/great_expectations/Dockerfile
+    container_name: epsi_dataops-ge-1
+    volumes:
+      - ./great_expectations:/usr/app/great_expectations
+      - ./data:/usr/app/data
+    working_dir: /usr/app
+    command: ["tail", "-f", "/dev/null"]
+    networks:
+      - epsi_dataops_network
+    depends_on:
+      - postgres
 
 volumes:
   postgres-db-volume:

@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+    - name: raw
+      schema: public
+      tables:
+          - name: sales
+            description: "Table raw des ventes importée depuis le CSV"
+
+models:
+    - name: stg_sales
+      description: "Table de staging des données de vente nettoyées"
+      columns:
+          - name: InvoiceNo
+            tests:
+                - not_null
+          - name: StockCode
+            tests:
+                - not_null
+          - name: CustomerID
+            tests:
+                - not_null
+          - name: UnitPrice
+            tests:
+                - not_null
+                - positive_value:
+                      value: "> 0"
